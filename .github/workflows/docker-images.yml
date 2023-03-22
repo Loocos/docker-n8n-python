@@ -62,7 +62,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: naskio/n8n-python
+          repository: locos975/n8n-python
           readme-filepath: README.md
 
       - name: Create Release in GitHub
