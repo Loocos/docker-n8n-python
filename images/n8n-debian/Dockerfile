@@ -12,6 +12,26 @@ RUN \
 	apt-get update && \
 	apt-get -y install graphicsmagick gosu git libnss libnss3-dev libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev
 
+RUN apt-get update \
+    && apt-get install -y wget gnupg \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+      --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN npm init -y &&  \
+    npm i puppeteer \
+    # Add user so we don't need --no-sandbox.
+    # same layer as npm install to keep re-chowned files from using up several hundred MBs more space
+    && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /node_modules \
+    && chown -R pptruser:pptruser /package.json \
+    && chown -R pptruser:pptruser /package-lock.json
+
 # Install python requirements
 RUN mkdir /requirements
 COPY requirements.txt /requirements/requirements.txt
@@ -24,7 +44,7 @@ USER root
 RUN npm_config_user=root npm install -g full-icu n8n@${N8N_VERSION}
 
 # Install n8n-nodes-python module
-RUN cd /usr/lib/node_modules/n8n && npm install n8n-nodes-python
+RUN cd /usr/lib/node_modules/n8n && npm install n8n-nodes-python && npm install n8n-nodes-puppeteer
 
 ENV NODE_ICU_DATA /usr/lib/node_modules/full-icu
 
