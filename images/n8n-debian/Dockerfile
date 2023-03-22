@@ -10,7 +10,7 @@ RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" 
 
 RUN \
 	apt-get update && \
-	apt-get -y install graphicsmagick gosu git libnss libnss3-dev libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev
+	apt-get -y install graphicsmagick gosu git
 
 RUN apt-get update \
     && apt-get install -y wget gnupg \
