@@ -10,8 +10,8 @@ chown -R node /home/node
 
 if [ "$#" -gt 0 ]; then
   # Got started with arguments
-  exec su-exec node "$@"
+  exec gosu node "$@"
 else
   # Got started without arguments
-  exec su-exec node n8n
+  exec gosu node n8n
 fi
