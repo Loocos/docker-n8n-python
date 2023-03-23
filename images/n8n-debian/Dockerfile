@@ -10,7 +10,7 @@ RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" 
 
 RUN \
 	apt-get update && \
-	apt-get -y install graphicsmagick gosu git tzdata tini su-exec
+	apt-get -y install graphicsmagick git tzdata tini su-exec
 
 # Install python requirements
 RUN mkdir /requirements
@@ -21,9 +21,13 @@ RUN pip install -r /requirements/requirements.txt
 # Set a custom user to not have n8n run as root
 USER root
 
-RUN apk --update add --virtual build-dependencies build-base ca-certificates && \
-	apk del build-dependencies \
-	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root;
+RUN apt-get update && \
+    apt-get install -y build-essential ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+RUN rm -rf /root /tmp/* && mkdir /root
+RUN apt-get remove -y build-essential
+
 RUN npm_config_user=root npm install -g full-icu n8n@${N8N_VERSION}
 
 # Install fonts
@@ -32,21 +36,34 @@ RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
 	fc-cache -f && \
 	apk del fonts && \
 	find  /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; \
-	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root \
+	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root
+
+RUN apt-get update && \
+    apt-get install -y fontconfig msttcorefonts && \
+    update-ms-fonts && \
+    fc-cache -f && \
+    apt-get remove -y msttcorefonts && \
+    find /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /root /tmp/*
+RUN mkdir /root
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 ENV NODE_ICU_DATA /usr/lib/node_modules/full-icu
 
-RUN apk update && apk add --no-cache nmap && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
-    apk update && \
-    apk add --no-cache \
-      chromium \
-      harfbuzz \
-      "freetype>2.8" \
-      ttf-freefont \
-      nss
+RUN apt-get update && \
+    apt-get install -y nmap && \
+    echo "deb http://deb.debian.org/debian sid main" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y \
+        chromium \
+        libharfbuzz0b \
+        libfreetype6 \
+        fonts-freefont-ttf \
+        libnss3 \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install n8n-nodes-python module
 RUN cd /usr/lib/node_modules/n8n && npm install n8n-nodes-python && npm install n8n-nodes-puppeteer
@@ -54,6 +71,6 @@ RUN cd /usr/lib/node_modules/n8n && npm install n8n-nodes-python && npm install 
 WORKDIR /data
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 5678/tcp
