@@ -1,4 +1,4 @@
-# n8n - docker image with Python 3.10 and custom node PythonFunction
+# n8n - docker image with Python 3.10 and custom nodes : PythonFunction, Puppeteer
 
 ![n8n.io - Workflow Automation](https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png)
 
