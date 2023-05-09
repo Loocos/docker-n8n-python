@@ -33,9 +33,9 @@ RUN npm_config_user=root npm install -g full-icu n8n@${N8N_VERSION}
 RUN apt-get update && \
     apt-get install -y wget \
     fontconfig && \
-    wget http://ftp.br.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.6_all.deb && \
-    apt --fix-broken install -y ./ttf-mscorefonts-installer_3.6_all.deb && \
-    rm ttf-mscorefonts-installer_3.6_all.deb && \
+    wget http://ftp.br.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.8_all.deb && \
+    apt --fix-broken install -y ./ttf-mscorefonts-installer_3.8_all.deb && \
+    rm ttf-mscorefonts-installer_3.8_all.deb && \
     fc-cache -f -v
 RUN rm -rf /root /tmp/* && mkdir /root
 
