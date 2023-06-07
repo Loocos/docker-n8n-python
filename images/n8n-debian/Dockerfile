@@ -75,7 +75,7 @@ RUN apt-get update && apt-get install -y \
 
 
 # Install n8n-nodes-python module
-RUN cd /usr/lib/node_modules/n8n && npm install n8n-nodes-python && npm install n8n-nodes-puppeteer && npm install jsonrepair
+RUN cd /usr/lib/node_modules/n8n && npm install n8n-nodes-python && npm install n8n-nodes-puppeteer && npm install jsonrepair && npm install imap && npm install util
 
 WORKDIR /data
 
